@@ -17,14 +17,31 @@
 
 const game = (() => {
   //caching elements
-
+  const board = document.querySelector('.board')
+  const pvpBtn = document.querySelector('#pvpButton')
+  const pvaiBtn = document.querySelector('#pvaiButton')
+  const restartBtn = document.querySelector('#restartGame')
+  const playersForm = document.querySelector('#players-form')
+  const p2Input = document.querySelector('.p2-input')
+  const aiInput = document.querySelector('.ai-input')
+  const p1Name = document.querySelector('#p1-name')
+  const p2Name = document.querySelector('#p2-name')
+  const aiDif = document.querySelector('#aiDif')
+  const statsCon = document.querySelector('.stats-container')
+  const popUpOverlay = document.querySelector('.popUp-overlay')
+  const popUpClose = document.querySelector('.popUp-close')
 
   //private variables
+  let mode = ''
+  let player1 = ''
+  let player2 = ''
 
   //listenners for pvp pvai buttons, this aproach will encapsulate all the logic
+  //listen pvp and pvai buttons
+  listen()
 
-  const start = () => {
-    //listen pvp and pvai buttons
+  function start() {
+    console.log('AAA')
     //mode pvp pvai, pop up the form and blacken the background, after hide pvp pvai buttons, and show players stats-container
     //  pvp, a form to let the players write their names, always player 1 will have X as marker
     //  pvai, same form above, just hidding player 2 fields
@@ -42,6 +59,97 @@ const game = (() => {
   //check win
   //restart - clear completely the game, hidding stats-container and showing pvp pvai buttons, 
   //
+
+  function popUpHandler(e) {
+    console.log(e)
+    //If pvp
+    if (e.target.id === 'pvpButton') {
+      popUpOverlay.style.display = 'block'
+      playersForm.style.display = 'flex'
+      mode = 'pvp'
+      //show p2-input
+      p2Input.style.display = 'block'
+      //Handle submit
+    }
+    //If pvAi
+    else if (e.target.id === 'pvaiButton') {
+      popUpOverlay.style.display = 'block'
+      playersForm.style.display = 'flex'
+      mode = 'pvai'
+      //show ai-input
+      aiInput.style.display = 'block'
+      //Handle submit
+    }
+    //If close popUp
+    else if (e.target.className === 'popUp-close' || (e.type === 'submit' && e.target.className === 'popUp')) {
+      popUpOverlay.style.display = 'none'
+      playersForm.style.display = 'none'
+      p2Input.style.display = 'none'
+      aiInput.style.display = 'none'
+      statsCon.style.display = 'none'
+    }
+    /// pvai settings form
+
+  }
+
+  function listen() {
+    pvpBtn.addEventListener('click', popUpHandler)
+    pvaiBtn.addEventListener('click', popUpHandler)
+    popUpClose.addEventListener('click', popUpHandler)
+    playersForm.addEventListener('submit', createPlayers)
+    restartBtn.addEventListener('click', clearGame)
+  }
+
+  function clearGame() {
+    //reset cells class
+    board.querySelectorAll('div').forEach(cell => {
+      cell.classList.remove('x')
+      cell.classList.remove('o')
+    })
+    player1 = ''
+    player2 = ''
+    //show pvp pvai buttons
+    pvpBtn.style.display = 'inline'
+    pvaiBtn.style.display = 'inline'
+    //hide stats
+    statsCon.style.display = 'none'
+
+  }
+
+  function createPlayers(e) {
+    e.preventDefault()
+
+    let player1Name = p1Name.value !== '' ? p1Name.value : 'Player1'
+    let player2Name = ''
+    if (mode === 'pvp') {
+      player2Name = p2Name.value !== '' ? p2Name.value : 'Player2'
+    } else {
+      player2Name = `Computer ${aiDif.options[aiDif.selectedIndex].textContent}`
+    }
+
+    player1 = player(player1Name, 'X')
+    player2 = player(player2Name, 'O')
+
+    console.log(player1.getName() + ' ' + player2.getName())
+    //close popUp
+    popUpHandler(e)
+    playersForm.reset()
+    //show stats and reset button
+    statsCon.style.display = 'block'
+    //hide pvp pvai buttons
+    pvpBtn.style.display = 'none'
+    pvaiBtn.style.display = 'none'
+    //setting stats-container
+    document.querySelector('.p1-mark').textContent = player1.getMark()
+    document.querySelector('.p2-mark').textContent = player2.getMark()
+    document.querySelector('#p1stat-name').textContent = player1.getName()
+    document.querySelector('#p2stat-name').textContent = player2.getName()
+
+
+
+    start()
+  }
+
 })()
 
 const player = (name, mark) => {

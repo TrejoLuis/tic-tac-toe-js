@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&family=Unbounded:wght@500&display=swap');
+
 * {
   box-sizing: border-box;
 }
@@ -6,6 +8,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+  font-family: 'Roboto', sans-serif;
 }
 
 body {
@@ -26,14 +29,52 @@ main {
 }
 
 .board {
+  font-family: 'Unbounded', sans-serif;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   justify-content: center;
   align-content: center;
+  cursor: pointer;
 }
 
 .cell {
   width: 100px;
   height: 100px;
   border: 1px solid black;
+  font-size: 6em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.cell.x::after {
+  content: 'X';
+}
+
+.cell.o::after {
+  content: 'O'
+}
+
+/* hovering only in empty cells */
+.board.x>*:not(.cell.x):not(.cell.o):hover::after {
+  color: lightgrey;
+  content: 'X';
+}
+
+.board.o>*:not(.cell.x):not(.cell.o):hover::after {
+  color: lightgrey;
+  content: 'O';
+}
+
+
+/* .board.x>:not(.cell.o):hover::after {
+  content: 'X';
+}
+
+.board.x>:not(.cell.o) {
+  color: red;
+} */
+
+/* .board.x>:hover::after:not(.o) {
+  content: 'X';
+} */

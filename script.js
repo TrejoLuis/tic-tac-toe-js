@@ -5,6 +5,7 @@ const game = (() => {
   const pvpBtn = document.querySelector('#pvpButton')
   const pvaiBtn = document.querySelector('#pvaiButton')
   const restartBtn = document.querySelector('#restartGame')
+  const continueBtn = document.querySelector('#continueBtn')
   const playersForm = document.querySelector('#players-form')
   const p2Input = document.querySelector('.p2-input')
   const aiInput = document.querySelector('.ai-input')
@@ -50,11 +51,7 @@ const game = (() => {
     if (!e.target.classList.contains('x') && !e.target.classList.contains('o')) {
       e.target.classList.add(players[turn].getMark())
       checkWin()
-      totalTurns += 1
-      if (totalTurns > 9) {
-        console.log('Match Tie')
-        newRound()
-      }
+
       swapTurn()
     }
     console.log(e.target)
@@ -67,6 +64,9 @@ const game = (() => {
   }
   function checkWin(e) {
     let currentMoves = []
+    //totalTurns 
+    totalTurns += 1
+    console.log('totalTurn: ' + totalTurns)
     // get all indexes from current player moves
     document.querySelectorAll(`.cell.${players[turn].getMark()}`).forEach(c => {
       currentMoves.push(Number(c.getAttribute('cell-index')))
@@ -75,6 +75,7 @@ const game = (() => {
     //check if some winner array is included in currentMoves,
     hasWin = winProbs.some(arr => arr.every(prob => currentMoves.includes(prob)))
     if (hasWin) {
+      resultMessage(true)
       console.log(`${players[turn].getName()} has win`)
       //add victory
       players[turn].win()
@@ -82,9 +83,29 @@ const game = (() => {
       let victorySpn = turn === 1 ? 'p2' : 'p1'
       document.querySelector(`#${victorySpn}-victories`).textContent = players[turn].getVictories()
       //winner popUp
-      //newRound
       newRound()
     }
+    if (totalTurns > 8) {
+      console.log('Match Tie')
+      resultMessage(false)
+      newRound()
+    }
+  }
+  function resultMessage(win) {
+    const resultMsgContainer = document.querySelector('.resultMessage')
+    const message = resultMsgContainer.querySelector('h2')
+    if (win) {
+      message.textContent = `${players[turn].getName()} WON`
+    } else {
+      message.textContent = 'Match Tied'
+    }
+    popUpOverlay.style.display = 'block'
+    resultMsgContainer.style.display = 'flex'
+    continueBtn.addEventListener('click', () => {
+      popUpOverlay.style.display = 'none'
+      resultMsgContainer.style.display = 'none'
+    })
+
   }
   function newRound() {
     board.querySelectorAll('div').forEach(cell => {

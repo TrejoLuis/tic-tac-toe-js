@@ -111,6 +111,12 @@ main {
   content: 'O';
 }
 
+.board:not(.x):not(.o),
+.cell.x,
+.cell.o {
+  cursor: not-allowed;
+}
+
 
 /* .board.x>:not(.cell.o):hover::after {
   content: 'X';

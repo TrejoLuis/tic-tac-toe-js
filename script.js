@@ -1,23 +1,7 @@
-
-// setting cells values example
-// const board = document.querySelector('.board')
-// const cells = board.querySelectorAll('div')
-
-// cells.forEach(c => c.addEventListener('click', (e) => {
-//   console.log(e.target)
-//   console.log(e.target.classList.contains('o'))
-//   if (!e.target.classList.contains('x') && !e.target.classList.contains('o')) {
-//     if (board.classList.contains('o')) {
-//       e.target.classList.add('o')
-//     } else if (board.classList.contains('x')) {
-//       e.target.classList.add('x')
-//     }
-//   }
-// }))
-
 const game = (() => {
   //caching elements
   const board = document.querySelector('.board')
+  const cells = board.querySelectorAll('div')
   const pvpBtn = document.querySelector('#pvpButton')
   const pvaiBtn = document.querySelector('#pvaiButton')
   const restartBtn = document.querySelector('#restartGame')
@@ -33,32 +17,101 @@ const game = (() => {
 
   //private variables
   let mode = ''
+  let turn = ''
+  let totalTurns = 0
   let player1 = ''
   let player2 = ''
+  let players = []
+  const winProbs = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
 
-  //listenners for pvp pvai buttons, this aproach will encapsulate all the logic
+  //listeners for pvp pvai buttons, this aproach will encapsulate all the logic
   //listen pvp and pvai buttons
   listen()
 
+  //TODO. AI
   function start() {
-    console.log('AAA')
-    //mode pvp pvai, pop up the form and blacken the background, after hide pvp pvai buttons, and show players stats-container
-    //  pvp, a form to let the players write their names, always player 1 will have X as marker
-    //  pvai, same form above, just hidding player 2 fields
-    //create players or player
+    console.log('Starting game')
     //random to decide who goes first
-    //loop until someone wins or there are no more turns
-    //  player move *if pvai check to run the ai* *based on its marker, set the board with that class*
-    //  check the board for winner *an array with the posibilities, and combination of each, compare with the cells* - or by creating a method on players to check each move it makes and comparing with the array* *if there's a winner or the game is tied, show end pop up
-    //  swap turn *swap board class*
+    players.push(player1)
+    players.push(player2)
+    turn = Math.floor(Math.random() * 2)
+    console.log(turn)
+    console.log(players)
+
+    //set first turn
+    board.classList.add(players[turn].getMark())
+
+    //board listener
+    cells.forEach(cell => {
+      cell.addEventListener('click', checkBoard, { once: true })
+    })
+  }
+  function checkBoard(e) {
+    if (!e.target.classList.contains('x') && !e.target.classList.contains('o')) {
+      e.target.classList.add(players[turn].getMark())
+      checkWin()
+      totalTurns += 1
+      if (totalTurns > 9) {
+        console.log('Match Tie')
+        newRound()
+      }
+      swapTurn()
+    }
+    console.log(e.target)
 
   }
-  //mode
-  //player move
-  //swap turn
-  //check win
-  //restart - clear completely the game, hidding stats-container and showing pvp pvai buttons, 
-  //
+  function makeMove(player) {
+    //set board class x or o
+    console.log(player.getName())
+    board.classList.add(player.getMark())
+  }
+  function checkWin(e) {
+    let currentMoves = []
+    // get all indexes from current player moves
+    document.querySelectorAll(`.cell.${players[turn].getMark()}`).forEach(c => {
+      currentMoves.push(Number(c.getAttribute('cell-index')))
+    })
+    let hasWin = false
+    //check if some winner array is included in currentMoves,
+    hasWin = winProbs.some(arr => arr.every(prob => currentMoves.includes(prob)))
+    if (hasWin) {
+      console.log(`${players[turn].getName()} has win`)
+      //add victory
+      players[turn].win()
+      //update player stat
+      let victorySpn = turn === 1 ? 'p2' : 'p1'
+      document.querySelector(`#${victorySpn}-victories`).textContent = players[turn].getVictories()
+      //winner popUp
+      //newRound
+      newRound()
+    }
+  }
+  function newRound() {
+    board.querySelectorAll('div').forEach(cell => {
+      cell.classList.remove('x')
+      cell.classList.remove('o')
+    })
+    board.classList.remove('x')
+    board.classList.remove('o')
+    //remove board listeners
+    cells.forEach(cell => {
+      cell.removeEventListener('click', checkBoard, { once: true })
+    })
+    //set first turn
+    board.classList.add(players[turn].getMark())
+
+    //board listener
+    cells.forEach(cell => {
+      cell.addEventListener('click', checkBoard, { once: true })
+    })
+    totalTurns = 0
+  }
+  function swapTurn() {
+    turn = turn === 1 ? 0 : 1
+    board.classList.remove('x')
+    board.classList.remove('o')
+    board.classList.add(players[turn].getMark())
+  }
 
   function popUpHandler(e) {
     console.log(e)
@@ -88,7 +141,6 @@ const game = (() => {
       aiInput.style.display = 'none'
       statsCon.style.display = 'none'
     }
-    /// pvai settings form
 
   }
 
@@ -106,13 +158,21 @@ const game = (() => {
       cell.classList.remove('x')
       cell.classList.remove('o')
     })
+    board.classList.remove('x')
+    board.classList.remove('o')
+    //remove board listeners
+    cells.forEach(cell => {
+      cell.removeEventListener('click', checkBoard, { once: true })
+    })
     player1 = ''
     player2 = ''
+    players = []
     //show pvp pvai buttons
     pvpBtn.style.display = 'inline'
     pvaiBtn.style.display = 'inline'
     //hide stats
     statsCon.style.display = 'none'
+    totalTurns = 0
 
   }
 
@@ -127,8 +187,8 @@ const game = (() => {
       player2Name = `Computer ${aiDif.options[aiDif.selectedIndex].textContent}`
     }
 
-    player1 = player(player1Name, 'X')
-    player2 = player(player2Name, 'O')
+    player1 = player(player1Name, 'x')
+    player2 = player(player2Name, 'o')
 
     console.log(player1.getName() + ' ' + player2.getName())
     //close popUp
@@ -144,8 +204,8 @@ const game = (() => {
     document.querySelector('.p2-mark').textContent = player2.getMark()
     document.querySelector('#p1stat-name').textContent = player1.getName()
     document.querySelector('#p2stat-name').textContent = player2.getName()
-
-
+    document.querySelector('#p1-victories').textContent = player1.getVictories()
+    document.querySelector('#p2-victories').textContent = player2.getVictories()
 
     start()
   }
@@ -167,7 +227,3 @@ const player = (name, mark) => {
     win
   }
 }
-
-//START
-const luis = player('Luis', 'x')
-const dio = player('Dio', 'o')

@@ -1,31 +1,50 @@
+:root {
+  --lt-sh-clr: #fffcc5;
+  --lt-acc-clr: #73B299;
+  --main-clr: #DA9C71;
+  --main-rgb-clr: 218, 156, 113;
+  --dk-acc-clr: #876D55;
+  --dk-sh-clr: #2C2C29;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Unbounded:wght@500&display=swap');
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html,
 body {
-  margin: 0;
-  padding: 0;
   font-family: 'Roboto', sans-serif;
+  font-size: 1.2rem;
+  color: var(--dk-sh-clr);
+  background-color: var(--lt-sh-clr);
 }
 
 body {
   height: 100vh;
   display: grid;
   grid-template-rows: 50px 1fr 50px;
+  gap: 2rem;
 }
 
 header {
-  background-color: aliceblue;
+  background-color: var(--lt-acc-clr);
+  display: flex;
+  align-items: center;
 }
 
 main {
-  background-color: antiquewhite;
   display: flex;
   align-items: center;
   flex-direction: column;
+  gap: 1rem;
+}
+
+footer {
+  text-align: center;
 }
 
 .popUp-overlay {
@@ -43,7 +62,8 @@ main {
   width: 300px;
   height: auto;
   padding: 1em;
-  background-color: aliceblue;
+  border-radius: 0.5em;
+  background-color: var(--lt-acc-clr);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -52,6 +72,60 @@ main {
   flex-direction: column;
   align-items: center;
   gap: 1em;
+}
+
+form.popUp>legend {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.popUp input[type='text'] {
+  padding: 0.25em 0.4em;
+  border: none;
+  border-radius: 0.4rem;
+  font-size: 0.8em;
+  width: 90%;
+  position: relative;
+}
+
+.popUp input[type='text']:focus {
+  outline: none;
+  background-color: var(--lt-sh-clr);
+}
+
+.popUp>label::after {
+  content: 'X';
+  font-weight: bold;
+  font-size: 1.1em;
+  position: absolute;
+  right: 0.8em;
+}
+
+.p2-input>label::after {
+  content: 'O';
+  font-weight: bold;
+  font-size: 1.1em;
+  position: absolute;
+  right: 0.8em;
+}
+
+.aiDifficult-container input[name='aiDif'] {
+  display: none;
+}
+
+.ai-input p {
+  margin-bottom: 0.5em;
+}
+
+.aiDifficult-container label {
+  padding: 0.25em 0.5em;
+  border-radius: 0.5em;
+  cursor: pointer;
+}
+
+.aiDifficult-container input[name='aiDif']:checked+label {
+  color: var(--lt-sh-clr);
+  background-color: var(--main-clr);
 }
 
 .popUp-close {
@@ -67,26 +141,53 @@ main {
   content: 'X'
 }
 
-.resultMessage {
-  position: fixed;
-  background-color: dodgerblue;
-  width: 200px;
-  padding: 2em;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-
 .p2-input,
 .ai-input,
 .stats-container {
   display: none;
+}
+
+.stats-container {
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.stats-container>p {
+  padding: 0.25em 0.5em;
+  border-radius: 0.4em;
+}
+
+.currentPlayerStat {
+  background-color: var(--lt-acc-clr);
+  box-shadow: 2px 2px 5px black;
+  transition: 200ms ease-in-out;
+}
+
+.playButtons-container {
+  display: flex;
+  gap: 1rem;
+}
+
+button {
+  font-size: 1.5em;
+  background-color: var(--dk-acc-clr);
+  color: var(--lt-sh-clr);
+  padding: 0.25em 0.5em;
+  border-radius: 0.5em;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  box-shadow: 2px 2px 5px black
+}
+
+button:active {
+  box-shadow: none;
+  background-color: var(--main-clr);
+
 }
 
 .board {
@@ -96,16 +197,38 @@ main {
   justify-content: center;
   align-content: center;
   cursor: pointer;
+  background-color: rgba(var(--main-rgb-clr), 0.6);
+  border-radius: 0.2em;
 }
 
 .cell {
   width: 100px;
   height: 100px;
   border: 1px solid black;
-  font-size: 6em;
+  font-size: 6rem;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.cell:nth-child(3n + 1) {
+  border-left: none;
+}
+
+.cell:nth-child(3n + 3) {
+  border-right: none;
+}
+
+.cell:nth-child(1),
+.cell:nth-child(2),
+.cell:nth-child(3) {
+  border-top: none;
+}
+
+.cell:nth-child(7),
+.cell:nth-child(8),
+.cell:nth-child(9) {
+  border-bottom: none;
 }
 
 .cell.x::after {
@@ -118,12 +241,12 @@ main {
 
 /* hovering only in empty cells */
 .board.x>*:not(.cell.x):not(.cell.o):hover::after {
-  color: lightgrey;
+  color: var(--lt-acc-clr);
   content: 'X';
 }
 
 .board.o>*:not(.cell.x):not(.cell.o):hover::after {
-  color: lightgrey;
+  color: var(--lt-acc-clr);
   content: 'O';
 }
 
@@ -132,16 +255,3 @@ main {
 .cell.o {
   cursor: not-allowed;
 }
-
-
-/* .board.x>:not(.cell.o):hover::after {
-  content: 'X';
-}
-
-.board.x>:not(.cell.o) {
-  color: red;
-} */
-
-/* .board.x>:hover::after:not(.o) {
-  content: 'X';
-} */

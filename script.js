@@ -11,13 +11,16 @@ const game = (() => {
   const aiInput = document.querySelector('.ai-input')
   const p1Name = document.querySelector('#p1-name')
   const p2Name = document.querySelector('#p2-name')
-  const aiDif = document.querySelector('#aiDif')
+  const aiDifficultNodes = document.querySelectorAll('input[name="aiDif"]')
   const statsCon = document.querySelector('.stats-container')
+  const p1stats = document.querySelector('[p1-stats]')
+  const p2stats = document.querySelector('[p2-stats]')
   const popUpOverlay = document.querySelector('.popUp-overlay')
   const popUpClose = document.querySelector('.popUp-close')
 
   //private variables
   let mode = ''
+  let aiLevel = ''
   let turn = ''
   let totalTurns = 0
   let player1 = ''
@@ -41,6 +44,8 @@ const game = (() => {
 
     //set first turn
     board.classList.add(players[turn].getMark())
+    turn === 0 ? p1stats.classList.add('currentPlayerStat')
+      : p2stats.classList.add('currentPlayerStat')
 
     //board listener
     cells.forEach(cell => {
@@ -114,12 +119,21 @@ const game = (() => {
     })
     board.classList.remove('x')
     board.classList.remove('o')
+
+    p1stats.classList.remove('currentPlayerStat')
+    p2stats.classList.remove('currentPlayerStat')
     //remove board listeners
     cells.forEach(cell => {
       cell.removeEventListener('click', checkBoard, { once: true })
     })
     //set first turn
+    turn = Math.floor(Math.random() * 2)
     board.classList.add(players[turn].getMark())
+    turn === 0
+      ? p1stats.classList.add('currentPlayerStat')
+      : p2stats.classList.add('currentPlayerStat')
+
+
 
     //board listener
     cells.forEach(cell => {
@@ -132,6 +146,9 @@ const game = (() => {
     board.classList.remove('x')
     board.classList.remove('o')
     board.classList.add(players[turn].getMark())
+
+    p1stats.classList.toggle('currentPlayerStat')
+    p2stats.classList.toggle('currentPlayerStat')
   }
 
   function popUpHandler(e) {
@@ -141,6 +158,7 @@ const game = (() => {
       popUpOverlay.style.display = 'block'
       playersForm.style.display = 'flex'
       mode = 'pvp'
+      document.querySelector('#p2-type').textContent = 'Player'
       //show p2-input
       p2Input.style.display = 'block'
       //Handle submit
@@ -150,6 +168,7 @@ const game = (() => {
       popUpOverlay.style.display = 'block'
       playersForm.style.display = 'flex'
       mode = 'pvai'
+      document.querySelector('#p2-type').textContent = 'AI'
       //show ai-input
       aiInput.style.display = 'block'
       //Handle submit
@@ -181,6 +200,8 @@ const game = (() => {
     })
     board.classList.remove('x')
     board.classList.remove('o')
+    p1stats.classList.remove('currentPlayerStat')
+    p2stats.classList.remove('currentPlayerStat')
     //remove board listeners
     cells.forEach(cell => {
       cell.removeEventListener('click', checkBoard, { once: true })
@@ -205,7 +226,13 @@ const game = (() => {
     if (mode === 'pvp') {
       player2Name = p2Name.value !== '' ? p2Name.value : 'Player2'
     } else {
-      player2Name = `Computer ${aiDif.options[aiDif.selectedIndex].textContent}`
+      // player2Name = `Computer ${aiDif.options[aiDif.selectedIndex].textContent}`
+      aiDifficultNodes.forEach(rad => {
+        if (rad.checked) {
+          player2Name = `Computer ${rad.id}`
+          aiLevel = rad.value
+        }
+      })
     }
 
     player1 = player(player1Name, 'x')
@@ -216,13 +243,13 @@ const game = (() => {
     popUpHandler(e)
     playersForm.reset()
     //show stats and reset button
-    statsCon.style.display = 'block'
+    statsCon.style.display = 'flex'
     //hide pvp pvai buttons
     pvpBtn.style.display = 'none'
     pvaiBtn.style.display = 'none'
     //setting stats-container
-    document.querySelector('.p1-mark').textContent = player1.getMark()
-    document.querySelector('.p2-mark').textContent = player2.getMark()
+    document.querySelector('.p1-mark').textContent = player1.getMark().toUpperCase()
+    document.querySelector('.p2-mark').textContent = player2.getMark().toUpperCase()
     document.querySelector('#p1stat-name').textContent = player1.getName()
     document.querySelector('#p2stat-name').textContent = player2.getName()
     document.querySelector('#p1-victories').textContent = player1.getVictories()

@@ -22,32 +22,31 @@
     <div class="popUp-overlay">
       <form id="players-form" class="popUp" action="#">
         <span class="popUp-close"></span>
-        <legend>Player vs <span id="p2-type">Player</span></legend>
+        <legend>Player vs <span id="p2-type"></span></legend>
         <label for="p1-name">
           Player 1:
           <input type="text" id="p1-name">
-          X
         </label>
         <div class="p2-input">
           <label for="p2-name">
             Player 2:
             <input type="text" id="p2-name">
-            O
           </label>
         </div>
         <div class="ai-input">
-          <label for="aiDif">AI Difficult
-            <select name="aiDif" id="aiDif">
-              <option value="1">Easy</option>
-              <option value="2">Normal</option>
-              <option value="3">Hard</option>
-            </select>
-            O
-          </label>
+          <p>
+            AI Difficult:
+          </p>
+          <div class='aiDifficult-container'>
+            <input type="radio" name="aiDif" id="Easy" value="1" checked>
+            <label for="Easy">Easy</label>
+            <input type="radio" name="aiDif" id="Hard" value="2">
+            <label for="Hard">Hard</label>
+          </div>
         </div>
         <button type="submit">Start</button>
       </form>
-      <div class="resultMessage">
+      <div class="resultMessage popUp">
         <h2></h2>
         <button id="continueBtn">Continue</button>
       </div>
